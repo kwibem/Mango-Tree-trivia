@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState } from "react";
 
 import "./Game.css"
 import response from "./data";
@@ -18,7 +18,7 @@ interface IData {
 const data: IData[] = response
 const numRows: number = data.length
 const numCols: number = data[0].questions.length
-const grid: boolean[][] = Array.from({ length: numRows }, () => Array(numCols).fill(false));
+const clickTrackerGrid: boolean[][] = Array.from({ length: numRows }, () => Array(numCols).fill(false));
 
 function shuffleQuestionChoices(incorrect_responses: string[] | undefined, correct_response: string | undefined): string[] | void {
     if (typeof incorrect_responses === "undefined" || typeof correct_response === "undefined") {
@@ -36,29 +36,30 @@ function shuffleQuestionChoices(incorrect_responses: string[] | undefined, corre
 
 const Game = () => {
     const [showQuestionModal, setShowQuestionModal] = useState<boolean>(false)
-    const [monitorGridClick, setMonitorGridClick] = useState<boolean[][]>(grid)
+    const [monitorGridClick, setMonitorGridClick] = useState<boolean[][]>(clickTrackerGrid)
     const [question, setQuestion] = useState<Partial<TQuestion>>({})
+    // this is the ordinal value for "a" we are using it to label the multiple choices dynamically.
+    const ordinalNumberForAtA: number = 97;
 
     const roundOnePointsMultiplier: number  = 100;
-    const choices = shuffleQuestionChoices(question.incorrect_answers, question.correct_answer)
+    const multiple_choices: string[] | void = shuffleQuestionChoices(question.incorrect_answers, question.correct_answer)
     let areAllCellsClicked: boolean = monitorGridClick.flat().every( isClicked => isClicked )
 
     function handleCardClick(rowIndex: number, columnIndex: number, question: TQuestion) {
-        if(grid[rowIndex][columnIndex]){
+        if(clickTrackerGrid[rowIndex][columnIndex]){
             return;
         }
 
-        let newGrid: boolean[][] = [...grid]
-        newGrid[rowIndex][columnIndex] = true
+        let newTrackerGrid: boolean[][] = [...clickTrackerGrid]
+        newTrackerGrid[rowIndex][columnIndex] = true
 
-        setMonitorGridClick(prevState => newGrid)
+        setMonitorGridClick(prevState => newTrackerGrid)
         setQuestion(prevState => question)
         setShowQuestionModal(prevState => true)
     }
 
     return (
         <div>
-
             <div className="grid">
                 { data.map((data: IData, index: number) => (
                     <div className="column" key={ index }>
@@ -81,18 +82,35 @@ const Game = () => {
                 ))}
             </div>
 
-            <div className="question modal">
-                { showQuestionModal ? <p> { question.question } </p> : null }
+            {  showQuestionModal ?
+                <div className="question modal">
+                    { <p> { question.question } </p> }
 
-                <div>
-                    {
-                        choices?.map((choice: string, index, number) => {
-                            return <button key={ index }> { choice } </button>
-                        })
-                    }
-                </div>
-            </div>
-
+                    <div>
+                        {
+                            multiple_choices?.map((choice: string, index: number) => {
+                                return (
+                                    <div key={ index }>
+                                        <span> { String.fromCharCode(ordinalNumberForAtA + index).toUpperCase() }</span>
+                                        <button
+                                            onClick={ event => {
+                                                if (typeof question.correct_answer === "undefined") {
+                                                    return;
+                                                }
+                                                if (event.currentTarget.innerText.toLowerCase()  === question.correct_answer.toLowerCase()) {
+                                                    alert("correct")
+                                                    setShowQuestionModal(prevState => false)
+                                                    return;
+                                                }
+                                            }}
+                                        > { choice } </button>
+                                    </div>)
+                            })
+                        }
+                    </div>
+                </div> :
+                null
+            }
             <div>
                 { areAllCellsClicked ? <button> Go to the Next Stage </button> : null }
             </div>
