@@ -1,0 +1,13 @@
+.grid {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-items: center;
+    gap: 15px;
+}
+
+.card {
+    justify-items: center;
+    border: 2px solid black;
+    gap: 2rem;
+}
