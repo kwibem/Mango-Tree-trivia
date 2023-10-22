@@ -2,18 +2,8 @@ import { useState } from "react";
 
 import "./Game.css"
 import response from "./data";
-
-type TQuestion = {
-    difficulty: string;
-    question: string;
-    correct_answer: string;
-    incorrect_answers: string[];
-}
-
-interface IData {
-    category: string;
-    questions: TQuestion[];
-}
+import Timer from "../../components/Timer";
+import {IQuestion, IData } from "../../utils/interfaces/questionInterface";
 
 const data: IData[] = response
 const numRows: number = data.length
@@ -37,7 +27,7 @@ function shuffleQuestionChoices(incorrect_responses: string[] | undefined, corre
 const Game = () => {
     const [showQuestionModal, setShowQuestionModal] = useState<boolean>(false)
     const [monitorGridClick, setMonitorGridClick] = useState<boolean[][]>(clickTrackerGrid)
-    const [question, setQuestion] = useState<Partial<TQuestion>>({})
+    const [question, setQuestion] = useState<Partial<IQuestion>>({})
     // this is the ordinal value for "a" we are using it to label the multiple choices dynamically.
     const ordinalNumberForAtA: number = 97;
 
@@ -45,7 +35,7 @@ const Game = () => {
     const multiple_choices: string[] | void = shuffleQuestionChoices(question.incorrect_answers, question.correct_answer)
     let areAllCellsClicked: boolean = monitorGridClick.flat().every( isClicked => isClicked )
 
-    function handleCardClick(rowIndex: number, columnIndex: number, question: TQuestion) {
+    function handleCardClick(rowIndex: number, columnIndex: number, question: IQuestion) {
         if(clickTrackerGrid[rowIndex][columnIndex]){
             return;
         }
@@ -65,7 +55,7 @@ const Game = () => {
                     <div className="column" key={ index }>
                         <h3> { data.category }</h3>
 
-                        { data.questions.map((question: TQuestion, count: number) => {
+                        { data.questions.map((question: IQuestion, count: number) => {
                             let points: number = (count + 1) * roundOnePointsMultiplier;
 
                             return (
@@ -83,32 +73,36 @@ const Game = () => {
             </div>
 
             {  showQuestionModal ?
-                <div className="question modal">
-                    { <p> { question.question } </p> }
+                <>
+                    <Timer setQuestionModal={setShowQuestionModal}/>
+                    <div className="question modal">
+                        { <p> { question.question } </p> }
 
-                    <div>
-                        {
-                            multiple_choices?.map((choice: string, index: number) => {
-                                return (
-                                    <div key={ index }>
-                                        <span> { String.fromCharCode(ordinalNumberForAtA + index).toUpperCase() }</span>
-                                        <button
-                                            onClick={ event => {
-                                                if (typeof question.correct_answer === "undefined") {
-                                                    return;
-                                                }
-                                                if (event.currentTarget.innerText.toLowerCase()  === question.correct_answer.toLowerCase()) {
-                                                    alert("correct")
-                                                    setShowQuestionModal(prevState => false)
-                                                    return;
-                                                }
-                                            }}
-                                        > { choice } </button>
-                                    </div>)
-                            })
-                        }
+                        <div>
+                            {
+                                multiple_choices?.map((choice: string, index: number) => {
+                                    return (
+                                        <div key={ index }>
+                                            <span> { String.fromCharCode(ordinalNumberForAtA + index).toUpperCase() }</span>
+                                            <button
+                                                onClick={ event => {
+                                                    if (typeof question.correct_answer === "undefined") {
+                                                        return;
+                                                    }
+                                                    if (event.currentTarget.innerText.toLowerCase()  === question.correct_answer.toLowerCase()) {
+                                                        alert("correct")
+                                                        setShowQuestionModal(prevState => false)
+                                                        return;
+                                                    }
+                                                }}
+                                            > { choice } </button>
+                                        </div>)
+                                })
+                            }
+                        </div>
                     </div>
-                </div> :
+                </>
+                :
                 null
             }
             <div>
