@@ -1,13 +1,31 @@
 .grid {
     display: flex;
-    align-items: center;
-    align-content: center;
-    justify-items: center;
+    height: 50vh;
     gap: 15px;
+    border-bottom: 4px solid black;
 }
 
-.card {
-    justify-items: center;
-    border: 2px solid black;
-    gap: 2rem;
+.column {
+    flex: 1;
+    padding: 10px;
+    box-sizing: border-box;
+    height: 100%; /* This ensures the columns stretch to the full height of the parent container */
+}
+.card_container {
+    gap: 10px;
+}
+
+.card{
+    display: flex;
+    justify-content: center;
+    border: 1px solid black;
+    margin-bottom: 10px;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.card.seen {
+    background-color: grey;
+    cursor: auto;
+    color: white;
 }

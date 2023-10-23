@@ -4,14 +4,14 @@ interface ITimerProps {
 }
 
 const Timer: React.FC<ITimerProps> = props => {
-    const maxQuestionWaitTime: number = 6 // TODO: Make this a state so that it's more dynamic
+    const maxQuestionWaitTime: number = 30 // TODO: Make this a state so that it's more dynamic
     const[seconds, setSeconds] = useState<number>(maxQuestionWaitTime)
     const { setQuestionModal} = props
 
     useEffect(() => {
 
         const interval = setInterval(() => {
-            if(seconds > 0){
+            if(seconds > 1){
                 setSeconds(prevState => prevState - 1)
             }else{
                 clearInterval(interval)
@@ -27,11 +27,9 @@ const Timer: React.FC<ITimerProps> = props => {
 
 
     return (
-        <>
-            <div>
-                Timer: { seconds }
-            </div>
-        </>
+        <div>
+            <p>Timer: <small>{ seconds }</small></p>
+        </div>
     );
 };
 
