@@ -18,7 +18,6 @@ const Game = () => {
     const [question, setQuestion] = useState<Partial<IQuestion>>({})
     const [points, setPoints] = useState<number>(0)
     const [pointTracker, setPointTracker] = useState<number>(0)
-    // this is the ordinal value for "a" we are using it to label the multiple choices dynamically.
 
     const roundOnePointsMultiplier: number  = 100;
     let areAllCellsClicked: boolean = monitorGridClick.flat().every( isClicked => isClicked )
@@ -70,13 +69,12 @@ const Game = () => {
 
             {  showQuestionModal ? <QuestionModal
                 setShowQuestionModal={setShowQuestionModal}
-                showQuestionModal={showQuestionModal}
                 question={question}
                 pointTracker={pointTracker}
                 setPoints={setPoints}
             /> : null}
             <div>
-                { areAllCellsClicked ? <button> Go to the Next Stage </button> : null }
+                { (areAllCellsClicked && !showQuestionModal)? <button> Go to the Next Round </button> : null }
             </div>
         </div>
     );
