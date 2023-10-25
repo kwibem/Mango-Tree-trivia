@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 const useTimeCounter  = (setQuestionModal: (value: (((prevState: boolean) => boolean) | boolean)) => void): number => {
 
-    const[seconds, setSeconds] = useState<number>(6)
+    const[seconds, setSeconds] = useState<number>(60)
 
     useEffect(() => {
 
@@ -12,7 +12,7 @@ const useTimeCounter  = (setQuestionModal: (value: (((prevState: boolean) => boo
                 clearInterval(interval)
                 setQuestionModal(false)
             }
-        }, 1000);
+        }, 10);
 
         return () => {
             clearInterval(interval)

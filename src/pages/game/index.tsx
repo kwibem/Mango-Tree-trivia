@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 
 import response from "./data";
 import { IQuestion, IData} from "../../utils/interfaces/questionInterface";
@@ -10,35 +10,41 @@ import {QuestionModal} from "../../components/QuestionModal";
 const data: IData[] = response
 const numRows: number = data.length
 const numCols: number = data[0].questions.length
-const clickTrackerGrid: boolean[][] = Array.from({ length: numRows }, () => Array(numCols).fill(false));
+const clickTrackerGrid = (): boolean[][] => Array.from({ length: numRows }, () => Array(numCols).fill(false));
 
 const Game = () => {
     const [showQuestionModal, setShowQuestionModal] = useState<boolean>(false)
-    const [monitorGridClick, setMonitorGridClick] = useState<boolean[][]>(clickTrackerGrid)
+    const [monitorGridClick, setMonitorGridClick] = useState<boolean[][]>(clickTrackerGrid())
     const [question, setQuestion] = useState<Partial<IQuestion>>({})
     const [points, setPoints] = useState<number>(0)
     const [pointTracker, setPointTracker] = useState<number>(0)
+    const [round, setRound] = useState<number>(1)
 
-    const roundOnePointsMultiplier: number  = 100;
     let areAllCellsClicked: boolean = monitorGridClick.flat().every( isClicked => isClicked )
 
-    function handleCardClick(rowIndex: number, columnIndex: number, question: IQuestion) {
-        if(clickTrackerGrid[rowIndex][columnIndex] || showQuestionModal){
-            return;
-        }
+    function handleCardClick(rowIndex: number, columnIndex: number, question: IQuestion, gamePoints: number) {
+        if(monitorGridClick[rowIndex][columnIndex]) return;
 
-        let newTrackerGrid: boolean[][] = [...clickTrackerGrid]
+        let newTrackerGrid: boolean[][] = [...monitorGridClick]
         newTrackerGrid[rowIndex][columnIndex] = true
 
         setMonitorGridClick(prevState => newTrackerGrid)
         setQuestion(prevState => question)
         setShowQuestionModal(prevState => true)
+        setPointTracker(gamePoints)
+    }
+
+
+    function handleUpdateRound(): void {
+        setMonitorGridClick(clickTrackerGrid())
+        setRound(prevState => prevState + 1)
     }
 
     return (
         <div>
             <nav>
                 <PointTracker points={points}/>
+                Round: <small>{ round } { showQuestionModal.toString()}</small>
             </nav>
             <div className="grid">
                 { data.map((data: IData, index: number) => (
@@ -46,15 +52,12 @@ const Game = () => {
                         <h3> { data.category }</h3>
                         <div className="card_container">
                             { data.questions.map((question: IQuestion, count: number) => {
-                                let gamePoints: number = (count + 1) * roundOnePointsMultiplier;
+                                let gamePoints: number = (count + 1) * round * 100;
 
                                 return (
                                     <div className={ monitorGridClick[index][count]? "card seen" : "card"}
-                                         key={ `${index}` + count }
-                                         onClick={ () => {
-                                             handleCardClick(index, count, question)
-                                             setPointTracker(gamePoints)
-                                         } }
+                                         key={`${index}` + count  }
+                                         onClick={ showQuestionModal ? undefined :  () => handleCardClick(index, count, question, gamePoints) }
                                     >
                                         <span>{ gamePoints  } </span>
                                     </div>
@@ -74,7 +77,13 @@ const Game = () => {
                 setPoints={setPoints}
             /> : null}
             <div>
-                { (areAllCellsClicked && !showQuestionModal)? <button> Go to the Next Round </button> : null }
+                { (areAllCellsClicked && !showQuestionModal)?
+                    <button
+                    onClick={handleUpdateRound}
+                    >
+                        Go to the Next Round
+                    </button> : null
+                }
             </div>
         </div>
     );
