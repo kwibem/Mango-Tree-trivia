@@ -1,6 +1,6 @@
 .grid {
     display: flex;
-    height: 50vh;
+    height: 40vh;
     gap: 15px;
     border-bottom: 4px solid black;
 }
@@ -9,18 +9,20 @@
     flex: 1;
     padding: 10px;
     box-sizing: border-box;
-    height: 100%; /* This ensures the columns stretch to the full height of the parent container */
 }
+
 .card_container {
     gap: 10px;
+}
+.row {
+    border: 1px solid black;
+    cursor: pointer;
 }
 
 .card{
     display: flex;
     justify-content: center;
-    border: 1px solid black;
     margin-bottom: 10px;
-    cursor: pointer;
     padding: 10px;
 }
 

@@ -1,8 +1,8 @@
 import React from "react";
+import {IQuestion} from "../../utils/interfaces/questionInterface";
 
-import {IQuestion} from "../utils/interfaces/questionInterface";
-
-import Timer from "./Timer";
+import Timer from "../Timer";
+import "./QuestionModal.css"
 
 interface IQuestionModalProps {
     question: Partial<IQuestion>;
@@ -13,7 +13,6 @@ interface IQuestionModalProps {
 
 export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
     const { question, pointTracker, setShowQuestionModal, setPoints } = props
-    const ordinalNumberForAtA: number = 97;
     const multiple_choices: string[] | void = shuffleQuestionChoices(question.incorrect_answers, question.correct_answer)
 
     function shuffleQuestionChoices(incorrect_responses: string[] | undefined, correct_response: string | undefined): string[] | void {
@@ -23,7 +22,6 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
 
         for (let count: number = multipleChoices.length - 1; count > 0; count--) {
             const shuffle = Math.floor(Math.random() * (count + 1));
-
             // Swap elements
             [multipleChoices[count], multipleChoices[shuffle]] = [multipleChoices[shuffle], multipleChoices[count]];
         }
@@ -31,9 +29,7 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
     }
 
     const handlePointUpdate = (event: { currentTarget: { innerText: string; }; }): void => {
-        if (typeof question.correct_answer === "undefined") {
-            return;
-        }
+        if (typeof question.correct_answer === "undefined")  return;
 
         (event.currentTarget.innerText.toLowerCase()  === question.correct_answer.toLowerCase()) ?
             setPoints(prevPoints => prevPoints + pointTracker)
@@ -44,19 +40,16 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
 
     return (
         <>
-            <Timer setQuestionModal={setShowQuestionModal}/>
             <div className="question modal">
+                <Timer setQuestionModal={setShowQuestionModal}/>
                 { <p> { question.question } </p> }
 
-                <div>
+                <div className="question_grid">
                     {
                         multiple_choices?.map((choice: string, index: number) => {
                             return (
-                                <div key={ index }>
-                                    <span> { String.fromCharCode(ordinalNumberForAtA + index).toUpperCase() }</span>
-                                    <button
-                                        onClick={ handlePointUpdate }
-                                    > { choice } </button>
+                                <div key={ index } className="question_column" onClick={ handlePointUpdate }>
+                                    { choice }
                                 </div>)
                         })
                     }

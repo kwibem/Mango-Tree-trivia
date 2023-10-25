@@ -5,7 +5,7 @@ import { IQuestion, IData} from "../../utils/interfaces/questionInterface";
 import PointTracker from "../../components/pointTracker";
 
 import "./Game.css"
-import {QuestionModal} from "../../components/QuestionModal";
+import {QuestionModal} from "../../components/questionModal/QuestionModal";
 
 const data: IData[] = response
 const numRows: number = data.length
@@ -49,13 +49,13 @@ const Game = () => {
             <div className="grid">
                 { data.map((data: IData, index: number) => (
                     <div className="column" key={ index }>
-                        <h3> { data.category }</h3>
                         <div className="card_container">
+                            <h3 className="card header"> { data.category }</h3>
                             { data.questions.map((question: IQuestion, count: number) => {
                                 let gamePoints: number = (count + 1) * round * 100;
 
                                 return (
-                                    <div className={ monitorGridClick[index][count]? "card seen" : "card"}
+                                    <div className={ monitorGridClick[index][count]? "card row seen" : "card row"}
                                          key={`${index}` + count  }
                                          onClick={ showQuestionModal ? undefined :  () => handleCardClick(index, count, question, gamePoints) }
                                     >
