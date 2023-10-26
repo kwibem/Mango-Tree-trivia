@@ -2,10 +2,11 @@ import {useState} from "react";
 
 import response from "./data";
 import { IQuestion, IData} from "../../utils/interfaces/questionInterface";
-import PointTracker from "../../components/pointTracker";
 
 import "./Game.css"
 import {QuestionModal} from "../../components/questionModal/QuestionModal";
+import {useNavigate} from "react-router-dom";
+import Navigation from "../../components/navigation";
 
 const data: IData[] = response
 const numRows: number = data.length
@@ -19,6 +20,7 @@ const Game = () => {
     const [points, setPoints] = useState<number>(0)
     const [pointTracker, setPointTracker] = useState<number>(0)
     const [round, setRound] = useState<number>(1)
+    const navigate = useNavigate()
 
     let areAllCellsClicked: boolean = monitorGridClick.flat().every( isClicked => isClicked )
 
@@ -37,15 +39,16 @@ const Game = () => {
 
     function handleUpdateRound(): void {
         setMonitorGridClick(clickTrackerGrid())
+        if(round === 3 ){
+            navigate("/final")
+            return;
+        }
         setRound(prevState => prevState + 1)
     }
 
     return (
         <div>
-            <nav>
-                <PointTracker points={points}/>
-                Round: <small>{ round } { showQuestionModal.toString()}</small>
-            </nav>
+            <Navigation round={round}  points={points}/>
             <div className="grid">
                 { data.map((data: IData, index: number) => (
                     <div className="column" key={ index }>
@@ -70,18 +73,19 @@ const Game = () => {
 
             {/*show the modal whenever available*/}
 
-            {  showQuestionModal ? <QuestionModal
+            <QuestionModal
                 setShowQuestionModal={setShowQuestionModal}
+                showQuestionModal={showQuestionModal}
                 question={question}
                 pointTracker={pointTracker}
                 setPoints={setPoints}
-            /> : null}
+            />
             <div>
                 { (areAllCellsClicked && !showQuestionModal)?
                     <button
-                    onClick={handleUpdateRound}
+                    onClick={ handleUpdateRound}
                     >
-                        Go to the Next Round
+                        { round === 3 ? "Get Scores" : "Go to the Next Round" }
                     </button> : null
                 }
             </div>

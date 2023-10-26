@@ -7,12 +7,13 @@ import "./QuestionModal.css"
 interface IQuestionModalProps {
     question: Partial<IQuestion>;
     pointTracker: number;
+    showQuestionModal: boolean;
     setPoints: React.Dispatch<React.SetStateAction<number>>;
     setShowQuestionModal:  React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
-    const { question, pointTracker, setShowQuestionModal, setPoints } = props
+    const { question, showQuestionModal, pointTracker, setShowQuestionModal, setPoints } = props
     const multiple_choices: string[] | void = shuffleQuestionChoices(question.incorrect_answers, question.correct_answer)
 
     function shuffleQuestionChoices(incorrect_responses: string[] | undefined, correct_response: string | undefined): string[] | void {
@@ -40,21 +41,22 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
 
     return (
         <>
-            <div className="question modal">
+            { showQuestionModal ? <div className="question modal">
                 <Timer setQuestionModal={setShowQuestionModal}/>
-                { <p> { question.question } </p> }
+                {<p> {question.question} </p>}
 
                 <div className="question_grid">
                     {
                         multiple_choices?.map((choice: string, index: number) => {
                             return (
-                                <div key={ index } className="question_column" onClick={ handlePointUpdate }>
-                                    { choice }
+                                <div key={index} className="question_column" onClick={handlePointUpdate}>
+                                    {choice}
                                 </div>)
                         })
                     }
                 </div>
-            </div>
+            </div> : null
+            }
         </>
     );
 };
