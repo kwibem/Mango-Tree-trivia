@@ -1,8 +1,11 @@
-const Final  = () => {
+import Layout from "../../components/Layout";
+
+const Final = () => {
     return (
-        <div>
+        <Layout className="layout--centered">
             <h1>Yay! You made it 🎉</h1>
-        </div>
+            <p>Congratulations on completing the trivia game!</p>
+        </Layout>
     );
 };
 

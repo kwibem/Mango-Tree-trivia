@@ -1,0 +1,23 @@
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+.layout__content {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout--centered {
+  align-items: center;
+  justify-content: center;
+}
+
+.layout--centered .layout__content {
+  align-items: center;
+  justify-content: center;
+}

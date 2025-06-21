@@ -1,14 +1,17 @@
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Layout from "../../components/Layout";
+import Button from "../../components/Button";
 
-const Home  = () => {
+const Home = () => {
     const navigate = useNavigate();
 
     return (
-        <div>
-            <button onClick={ ()=> { navigate("/game") }}>
+        <Layout className="layout--centered">
+            <h1>Mango Tree Trivia</h1>
+            <Button onClick={() => navigate("/game")}>
                 Start the Game
-            </button>
-        </div>
+            </Button>
+        </Layout>
     );
 };
 

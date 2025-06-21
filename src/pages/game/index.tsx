@@ -1,12 +1,15 @@
-import {useState} from "react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import response from "./data";
-import { IQuestion, IData} from "../../utils/interfaces/questionInterface";
+import { IQuestion, IData } from "../../utils/interfaces/questionInterface";
+import { QuestionModal } from "../../components/questionModal/QuestionModal";
+import Navigation from "../../components/navigation";
+import Layout from "../../components/Layout";
+import GameGrid from "../../components/GameGrid";
+import Button from "../../components/Button";
 
 import "./Game.css"
-import {QuestionModal} from "../../components/questionModal/QuestionModal";
-import {useNavigate} from "react-router-dom";
-import Navigation from "../../components/navigation";
 
 const data: IData[] = response
 const numRows: number = data.length
@@ -47,29 +50,15 @@ const Game = () => {
     }
 
     return (
-        <div>
-            <Navigation round={round}  points={points}/>
-            <div className="grid">
-                { data.map((data: IData, index: number) => (
-                    <div className="column" key={ index }>
-                        <div className="card_container">
-                            <h3 className="card header"> { data.category }</h3>
-                            { data.questions.map((question: IQuestion, count: number) => {
-                                let gamePoints: number = (count + 1) * round * 100;
-
-                                return (
-                                    <div className={ monitorGridClick[index][count]? "card row seen" : "card row"}
-                                         key={`${index}` + count  }
-                                         onClick={ showQuestionModal ? undefined :  () => handleCardClick(index, count, question, gamePoints) }
-                                    >
-                                        <span>{ gamePoints  } </span>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-                ))}
-            </div>
+        <Layout>
+            <Navigation round={round} points={points} />
+            <GameGrid
+                data={data}
+                monitorGridClick={monitorGridClick}
+                round={round}
+                onCardClick={handleCardClick}
+                disabled={showQuestionModal}
+            />
 
             {/*show the modal whenever available*/}
 
@@ -80,16 +69,14 @@ const Game = () => {
                 pointTracker={pointTracker}
                 setPoints={setPoints}
             />
-            <div>
-                { (areAllCellsClicked && !showQuestionModal)?
-                    <button
-                    onClick={ handleUpdateRound}
-                    >
-                        { round === 3 ? "Get Scores" : "Go to the Next Round" }
-                    </button> : null
-                }
-            </div>
-        </div>
+            {(areAllCellsClicked && !showQuestionModal) && (
+                <div style={{ textAlign: 'center', marginTop: '20px' }}>
+                    <Button onClick={handleUpdateRound}>
+                        {round === 3 ? "Get Scores" : "Go to the Next Round"}
+                    </Button>
+                </div>
+            )}
+        </Layout>
     );
 };
 
