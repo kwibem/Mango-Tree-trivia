@@ -18,12 +18,12 @@
 }
 
 .game-grid__category-title {
-  background-color: #28a745;
+  background-color: #6c757d;
   color: white;
   text-align: center;
   padding: 15px;
   margin: 0 5px 10px 5px;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 1.1em;
   font-weight: bold;
 }

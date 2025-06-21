@@ -41,22 +41,29 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
 
     return (
         <>
-            { showQuestionModal ? <div className="question modal">
-                <Timer setQuestionModal={setShowQuestionModal}/>
-                {<p> {question.question} </p>}
+            {showQuestionModal && (
+                <div className="modal-overlay">
+                    <div className="question modal">
+                        <div className="modal__header">
+                            <Timer setQuestionModal={setShowQuestionModal} />
+                        </div>
+                        
+                        <p className="modal__question">{question.question}</p>
 
-                <div className="question_grid">
-                    {
-                        multiple_choices?.map((choice: string, index: number) => {
-                            return (
-                                <div key={index} className="question_column" onClick={handlePointUpdate}>
+                        <div className="question_grid">
+                            {multiple_choices?.map((choice: string, index: number) => (
+                                <div 
+                                    key={index} 
+                                    className="question_column" 
+                                    onClick={handlePointUpdate}
+                                >
                                     {choice}
-                                </div>)
-                        })
-                    }
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
-            </div> : null
-            }
+            )}
         </>
     );
 };

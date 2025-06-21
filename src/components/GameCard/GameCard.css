@@ -2,11 +2,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #007bff;
+  background-color: #6c757d;
   color: white;
   padding: 20px;
   margin: 5px;
-  border-radius: 8px;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 60px;
@@ -15,18 +15,18 @@
 }
 
 .game-card:hover {
-  background-color: #0056b3;
+  background-color: #545b62;
   transform: scale(1.05);
 }
 
 .game-card--clicked {
-  background-color: #6c757d;
+  background-color: #495057;
   cursor: not-allowed;
   opacity: 0.7;
 }
 
 .game-card--clicked:hover {
-  background-color: #6c757d;
+  background-color: #495057;
   transform: none;
 }
 
