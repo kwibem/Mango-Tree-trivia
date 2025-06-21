@@ -4,7 +4,7 @@ import Home from "./pages/home";
 import Game from "./pages/game";
 import Final from "./pages/final";
 
-function App(): JSX.Element {
+function App(): React.JSX.Element {
   return (
     <div className="App">
       <Router>
