@@ -9,7 +9,8 @@ interface ITimerProps {
 const Timer: React.FC<ITimerProps> = props => {
     const { setQuestionModal } = props;
     const seconds = useTimeCounter(setQuestionModal);
-    const progress = (seconds / 10) * 100;
+    const timerDuration = Number(process.env.REACT_APP_TIMER_DURATION) || 10;
+    const progress = (seconds / timerDuration) * 100;
 
     return (
         <div className="timer-container">
