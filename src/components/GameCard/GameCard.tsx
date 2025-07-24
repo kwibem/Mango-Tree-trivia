@@ -8,7 +8,7 @@ interface GameCardProps {
   disabled?: boolean;
 }
 
-const GameCard: React.FC<GameCardProps> = ({ 
+const GameCard: React.FC<GameCardProps> = React.memo(({ 
   points, 
   isClicked, 
   onClick, 
@@ -22,6 +22,6 @@ const GameCard: React.FC<GameCardProps> = ({
       <span className="game-card__points">{points}</span>
     </div>
   );
-};
+});
 
 export default GameCard;

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import response from "./data";
@@ -25,7 +25,10 @@ const Game = () => {
     const [round, setRound] = useState<number>(1)
     const navigate = useNavigate()
 
-    let areAllCellsClicked: boolean = monitorGridClick.flat().every( isClicked => isClicked )
+    const areAllCellsClicked: boolean = useMemo(() => 
+        monitorGridClick.flat().every(isClicked => isClicked), 
+        [monitorGridClick]
+    )
 
     function handleCardClick(rowIndex: number, columnIndex: number, question: IQuestion, gamePoints: number) {
         if(monitorGridClick[rowIndex][columnIndex]) return;

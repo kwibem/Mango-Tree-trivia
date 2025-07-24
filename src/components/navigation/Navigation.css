@@ -1,0 +1,13 @@
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: calc(100% + 40px);
+  margin: -20px -20px 0 -20px;
+}

@@ -3,7 +3,7 @@ import React from "react";
 interface IPointTracker{
     points: number;
 }
-const PointTracker: React.FC<IPointTracker>= props => {
+const PointTracker: React.FC<IPointTracker>= React.memo(props => {
 
     const { points } = props
     return (
@@ -14,6 +14,6 @@ const PointTracker: React.FC<IPointTracker>= props => {
 
         </>
     );
-};
+});
 
 export default PointTracker;
