@@ -14,29 +14,27 @@ interface IQuestionModalProps {
 
 export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
     const { question, showQuestionModal, pointTracker, setShowQuestionModal, setPoints } = props
-    const multiple_choices: string[] | void = shuffleQuestionChoices(question.incorrect_answers, question.correct_answer)
+    const [userAnswer, setUserAnswer] = React.useState<string>("");
 
-    function shuffleQuestionChoices(incorrect_responses: string[] | undefined, correct_response: string | undefined): string[] | void {
-        if (typeof incorrect_responses === "undefined" || typeof correct_response === "undefined") return;
+    const handleSubmit = (): void => {
+        if (typeof question.correct_answer === "undefined") return;
 
-        let multipleChoices = [...incorrect_responses, correct_response]
+        const isCorrect = userAnswer.trim().toLowerCase() === question.correct_answer.toLowerCase();
 
-        for (let count: number = multipleChoices.length - 1; count > 0; count--) {
-            const shuffle = Math.floor(Math.random() * (count + 1));
-            // Swap elements
-            [multipleChoices[count], multipleChoices[shuffle]] = [multipleChoices[shuffle], multipleChoices[count]];
+        if (isCorrect) {
+            setPoints(prevPoints => prevPoints + pointTracker);
+        } else {
+            setPoints(prevPoints => prevPoints - pointTracker);
         }
-        return multipleChoices
+
+        setUserAnswer(""); // Reset answer
+        setShowQuestionModal(false);
     }
 
-    const handlePointUpdate = (event: { currentTarget: { innerText: string; }; }): void => {
-        if (typeof question.correct_answer === "undefined")  return;
-
-        (event.currentTarget.innerText.toLowerCase()  === question.correct_answer.toLowerCase()) ?
-            setPoints(prevPoints => prevPoints + pointTracker)
-            :  setPoints(prevPoints => prevPoints - pointTracker)
-
-        setShowQuestionModal(prevState => false)
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSubmit();
+        }
     }
 
     return (
@@ -50,16 +48,19 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
                         
                         <p className="modal__question">{question.question}</p>
 
-                        <div className="question_grid">
-                            {multiple_choices?.map((choice: string, index: number) => (
-                                <div 
-                                    key={index} 
-                                    className="question_column" 
-                                    onClick={handlePointUpdate}
-                                >
-                                    {choice}
-                                </div>
-                            ))}
+                        <div className="input-container">
+                            <input
+                                type="text"
+                                className="modal__input"
+                                value={userAnswer}
+                                onChange={(e) => setUserAnswer(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                placeholder="Type your answer..."
+                                autoFocus
+                            />
+                            <button className="modal__submit-btn" onClick={handleSubmit}>
+                                Submit
+                            </button>
                         </div>
                     </div>
                 </div>

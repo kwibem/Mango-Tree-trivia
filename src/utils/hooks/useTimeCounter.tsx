@@ -12,18 +12,18 @@ const useTimeCounter  = (setQuestionModal: (value: (((prevState: boolean) => boo
     useEffect(() => {
         intervalRef.current = setInterval(() => {
             setSeconds(prevSeconds => {
-                if(prevSeconds > 1){
-                    return prevSeconds - 1
+                if (prevSeconds > 1) {
+                    return prevSeconds - 1;
                 } else {
-                    if(intervalRef.current) {
-                        clearInterval(intervalRef.current)
+                    if (intervalRef.current) {
+                        clearInterval(intervalRef.current);
                     }
                     // Use setTimeout to defer the state update to the next tick
-                    setTimeout(() => closeModal(), 0)
-                    return 0
+                    setTimeout(() => closeModal(), 0);
+                    return 0;
                 }
-            })
-        }, 500);
+            });
+        }, 1000);
 
         return () => {
             if(intervalRef.current) {
