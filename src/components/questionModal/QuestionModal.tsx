@@ -20,6 +20,7 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
     const { question, showQuestionModal, pointTracker, setShowQuestionModal, setPoints } = props
     const [userAnswer, setUserAnswer] = React.useState<string>("");
     const [isValidating, setIsValidating] = React.useState<boolean>(false);
+    const [feedbackStatus, setFeedbackStatus] = React.useState<'idle' | 'correct' | 'incorrect'>('idle');
 
     const handleSubmit = async (): Promise<void> => {
         if (typeof question.correct_answer === "undefined" || typeof question.question === "undefined") return;
@@ -34,12 +35,19 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
             );
 
             if (isCorrect) {
+                setFeedbackStatus('correct');
+                // Wait for animation
+                await new Promise(resolve => setTimeout(resolve, 500));
                 setPoints(prevPoints => prevPoints + pointTracker);
             } else {
+                setFeedbackStatus('incorrect');
+                // Wait for animation
+                await new Promise(resolve => setTimeout(resolve, 500));
                 setPoints(prevPoints => prevPoints - pointTracker);
             }
 
             setUserAnswer(""); // Reset answer
+            setFeedbackStatus('idle');
             setShowQuestionModal(false);
         } catch (error) {
             console.error("Error validating answer:", error);
@@ -58,7 +66,7 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
     return (
         <>
             {showQuestionModal && (
-                <div className="modal-overlay">
+                <div className={`modal-overlay ${feedbackStatus}`} data-testid="modal-overlay">
                     <div className="question modal">
                         <div className="modal__header">
                             <Timer setQuestionModal={setShowQuestionModal} />

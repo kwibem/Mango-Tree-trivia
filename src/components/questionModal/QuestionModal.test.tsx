@@ -73,10 +73,17 @@ describe('QuestionModal Component', () => {
         // Expect button to show loading state
         expect(screen.getByText('Checking...')).toBeInTheDocument();
 
+        // Wait for feedback state
+        await waitFor(() => {
+            const overlay = screen.getByTestId('modal-overlay');
+            expect(overlay).toHaveClass('correct');
+        });
+
+        // Wait for modal to close (after delay)
         await waitFor(() => {
             expect(mockSetPoints).toHaveBeenCalledWith(expect.any(Function));
             expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
-        });
+        }, { timeout: 1000 }); // Increase timeout to account for 500ms delay
     });
 
     test('submitting incorrect answer subtracts points and closes modal', async () => {
@@ -98,10 +105,16 @@ describe('QuestionModal Component', () => {
         const submitBtn = screen.getByText('Submit');
         fireEvent.click(submitBtn);
 
+        // Wait for feedback state
+        await waitFor(() => {
+            const overlay = screen.getByTestId('modal-overlay');
+            expect(overlay).toHaveClass('incorrect');
+        });
+
         await waitFor(() => {
             expect(mockSetPoints).toHaveBeenCalledWith(expect.any(Function));
             expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
-        });
+        }, { timeout: 1000 });
     });
 
     test('submitting is case insensitive (handled by service/mock)', async () => {

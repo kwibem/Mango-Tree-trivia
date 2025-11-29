@@ -93,3 +93,17 @@
     background-color: #6c757d;
     cursor: wait;
 }
+
+.modal-overlay {
+    transition: background-color 0.1s ease;
+}
+
+.modal-overlay.correct {
+    background-color: rgba(46, 204, 113, 0.9);
+    /* Bright Green */
+}
+
+.modal-overlay.incorrect {
+    background-color: rgba(231, 76, 60, 0.9);
+    /* Bright Red */
+}
