@@ -81,3 +81,29 @@
 .modal__submit-btn:active {
     transform: translateY(0);
 }
+
+.modal__submit-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.modal__submit-btn.validating {
+    background-color: #6c757d;
+    cursor: wait;
+}
+
+.modal-overlay {
+    transition: background-color 0.1s ease;
+}
+
+.modal-overlay.correct {
+    background-color: rgba(46, 204, 113, 0.9);
+    /* Bright Green */
+}
+
+.modal-overlay.incorrect {
+    background-color: rgba(231, 76, 60, 0.9);
+    /* Bright Red */
+}
