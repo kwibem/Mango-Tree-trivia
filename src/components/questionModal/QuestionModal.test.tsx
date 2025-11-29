@@ -1,7 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QuestionModal } from './QuestionModal';
 import { IQuestion } from '../../utils/interfaces/questionInterface';
+import { validateAnswerWithLLM } from '../../services/llmService';
+
+// Mock the LLM service
+jest.mock('../../services/llmService');
 
 const mockQuestion: Partial<IQuestion> = {
     question: 'What is the capital of France?',
@@ -15,6 +19,8 @@ describe('QuestionModal Component', () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        // Default mock implementation to return true (correct answer)
+        (validateAnswerWithLLM as jest.Mock).mockResolvedValue(true);
     });
 
     test('renders nothing when showQuestionModal is false', () => {
@@ -45,7 +51,9 @@ describe('QuestionModal Component', () => {
         expect(screen.getByText('Submit')).toBeInTheDocument();
     });
 
-    test('submitting correct answer adds points and closes modal', () => {
+    test('submitting correct answer adds points and closes modal', async () => {
+        (validateAnswerWithLLM as jest.Mock).mockResolvedValue(true);
+
         render(
             <QuestionModal
                 question={mockQuestion}
@@ -62,13 +70,18 @@ describe('QuestionModal Component', () => {
         const submitBtn = screen.getByText('Submit');
         fireEvent.click(submitBtn);
 
-        expect(mockSetPoints).toHaveBeenCalledWith(expect.any(Function));
-        // We can't easily test the functional update value without more complex mocking, 
-        // but we can verify it was called.
-        expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
+        // Expect button to show loading state
+        expect(screen.getByText('Checking...')).toBeInTheDocument();
+
+        await waitFor(() => {
+            expect(mockSetPoints).toHaveBeenCalledWith(expect.any(Function));
+            expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
+        });
     });
 
-    test('submitting incorrect answer subtracts points and closes modal', () => {
+    test('submitting incorrect answer subtracts points and closes modal', async () => {
+        (validateAnswerWithLLM as jest.Mock).mockResolvedValue(false);
+
         render(
             <QuestionModal
                 question={mockQuestion}
@@ -85,11 +98,15 @@ describe('QuestionModal Component', () => {
         const submitBtn = screen.getByText('Submit');
         fireEvent.click(submitBtn);
 
-        expect(mockSetPoints).toHaveBeenCalledWith(expect.any(Function));
-        expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
+        await waitFor(() => {
+            expect(mockSetPoints).toHaveBeenCalledWith(expect.any(Function));
+            expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
+        });
     });
 
-    test('submitting is case insensitive', () => {
+    test('submitting is case insensitive (handled by service/mock)', async () => {
+        (validateAnswerWithLLM as jest.Mock).mockResolvedValue(true);
+
         render(
             <QuestionModal
                 question={mockQuestion}
@@ -106,7 +123,34 @@ describe('QuestionModal Component', () => {
         const submitBtn = screen.getByText('Submit');
         fireEvent.click(submitBtn);
 
-        expect(mockSetPoints).toHaveBeenCalled();
-        expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
+        await waitFor(() => {
+            expect(mockSetPoints).toHaveBeenCalled();
+            expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
+        });
+    });
+
+    test('submitting answer with minor typo is accepted (handled by service/mock)', async () => {
+        (validateAnswerWithLLM as jest.Mock).mockResolvedValue(true);
+
+        render(
+            <QuestionModal
+                question={mockQuestion}
+                pointTracker={100}
+                showQuestionModal={true}
+                setPoints={mockSetPoints}
+                setShowQuestionModal={mockSetShowQuestionModal}
+            />
+        );
+
+        const input = screen.getByPlaceholderText('Type your answer...');
+        fireEvent.change(input, { target: { value: 'Pari' } });
+
+        const submitBtn = screen.getByText('Submit');
+        fireEvent.click(submitBtn);
+
+        await waitFor(() => {
+            expect(mockSetPoints).toHaveBeenCalledWith(expect.any(Function));
+            expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
+        });
     });
 });

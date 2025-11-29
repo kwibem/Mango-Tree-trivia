@@ -1,38 +1,56 @@
 import React from "react";
-import {IQuestion} from "../../utils/interfaces/questionInterface";
+import { IQuestion } from "../../utils/interfaces/questionInterface";
 
 import Timer from "../Timer";
 import "./QuestionModal.css"
+
+import { validateAnswerWithLLM } from "../../services/llmService";
 
 interface IQuestionModalProps {
     question: Partial<IQuestion>;
     pointTracker: number;
     showQuestionModal: boolean;
     setPoints: React.Dispatch<React.SetStateAction<number>>;
-    setShowQuestionModal:  React.Dispatch<React.SetStateAction<boolean>>;
+    setShowQuestionModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
+
+
 
 export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
     const { question, showQuestionModal, pointTracker, setShowQuestionModal, setPoints } = props
     const [userAnswer, setUserAnswer] = React.useState<string>("");
+    const [isValidating, setIsValidating] = React.useState<boolean>(false);
 
-    const handleSubmit = (): void => {
-        if (typeof question.correct_answer === "undefined") return;
+    const handleSubmit = async (): Promise<void> => {
+        if (typeof question.correct_answer === "undefined" || typeof question.question === "undefined") return;
 
-        const isCorrect = userAnswer.trim().toLowerCase() === question.correct_answer.toLowerCase();
+        setIsValidating(true);
 
-        if (isCorrect) {
-            setPoints(prevPoints => prevPoints + pointTracker);
-        } else {
-            setPoints(prevPoints => prevPoints - pointTracker);
+        try {
+            const isCorrect = await validateAnswerWithLLM(
+                question.question,
+                question.correct_answer,
+                userAnswer
+            );
+
+            if (isCorrect) {
+                setPoints(prevPoints => prevPoints + pointTracker);
+            } else {
+                setPoints(prevPoints => prevPoints - pointTracker);
+            }
+
+            setUserAnswer(""); // Reset answer
+            setShowQuestionModal(false);
+        } catch (error) {
+            console.error("Error validating answer:", error);
+            // Handle error appropriately, maybe show a message
+        } finally {
+            setIsValidating(false);
         }
-
-        setUserAnswer(""); // Reset answer
-        setShowQuestionModal(false);
     }
 
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && !isValidating) {
             handleSubmit();
         }
     }
@@ -45,7 +63,7 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
                         <div className="modal__header">
                             <Timer setQuestionModal={setShowQuestionModal} />
                         </div>
-                        
+
                         <p className="modal__question">{question.question}</p>
 
                         <div className="input-container">
@@ -57,9 +75,14 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
                                 onKeyDown={handleKeyDown}
                                 placeholder="Type your answer..."
                                 autoFocus
+                                disabled={isValidating}
                             />
-                            <button className="modal__submit-btn" onClick={handleSubmit}>
-                                Submit
+                            <button
+                                className={`modal__submit-btn ${isValidating ? 'validating' : ''}`}
+                                onClick={handleSubmit}
+                                disabled={isValidating}
+                            >
+                                {isValidating ? "Checking..." : "Submit"}
                             </button>
                         </div>
                     </div>
