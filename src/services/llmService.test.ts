@@ -56,4 +56,37 @@ describe('validateAnswerWithLLM', () => {
         expect(result).toBe(false);
         expect(isFuzzyMatch).toHaveBeenCalledWith('User', 'Correct');
     });
+
+    it('should sanitize input by removing XML tags', async () => {
+        (global.fetch as jest.Mock).mockResolvedValue({
+            ok: true,
+            json: async () => ({ response: 'YES' }),
+        });
+
+        await validateAnswerWithLLM('Question', 'Correct', '<script>alert("xss")</script>User');
+
+        // Check the prompt sent to fetch to verify sanitization
+        const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
+        const body = JSON.parse(fetchCall[1].body);
+
+        expect(body.prompt).toContain('<user_answer>alert("xss")User</user_answer>');
+        expect(body.prompt).not.toContain('<script>');
+    });
+
+    it('should truncate long inputs', async () => {
+        (global.fetch as jest.Mock).mockResolvedValue({
+            ok: true,
+            json: async () => ({ response: 'YES' }),
+        });
+
+        const longInput = 'a'.repeat(150);
+        await validateAnswerWithLLM('Question', 'Correct', longInput);
+
+        const fetchCall = (global.fetch as jest.Mock).mock.calls[0];
+        const body = JSON.parse(fetchCall[1].body);
+
+        // Should be truncated to 100 chars
+        const match = body.prompt.match(/<user_answer>(.*?)<\/user_answer>/);
+        expect(match[1].length).toBe(100);
+    });
 });
