@@ -18,8 +18,4 @@ describe('Timer Component', () => {
         expect(progressBar).toBeInTheDocument();
     });
 
-    test('passes isPaused to useTimeCounter', () => {
-        render(<Timer setQuestionModal={() => { }} isPaused={true} />);
-        expect(useTimeCounter).toHaveBeenCalledWith(expect.any(Function), true);
-    });
 });

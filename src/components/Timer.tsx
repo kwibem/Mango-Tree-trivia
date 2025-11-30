@@ -3,13 +3,12 @@ import useTimeCounter from "../utils/hooks/useTimeCounter";
 import './Timer.css';
 
 interface ITimerProps {
-    setQuestionModal: React.Dispatch<React.SetStateAction<boolean>>;
-    isPaused?: boolean;
+    setQuestionModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const Timer: React.FC<ITimerProps> = props => {
-    const { setQuestionModal, isPaused = false } = props;
-    const seconds = useTimeCounter(setQuestionModal, isPaused);
+    const { setQuestionModal } = props;
+    const seconds = useTimeCounter(setQuestionModal);
     const timerDuration = Number(process.env.REACT_APP_TIMER_DURATION) || 10;
     const progress = (seconds / timerDuration) * 100;
 

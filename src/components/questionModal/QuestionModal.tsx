@@ -27,9 +27,6 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
 
         setIsValidating(true);
 
-        // Sleep for 3 seconds to test timer pause
-        await new Promise(resolve => setTimeout(resolve, 3000));
-
         try {
             const isCorrect = await validateAnswerWithLLM(
                 question.question,
@@ -72,7 +69,7 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
                 <div className={`modal-overlay ${feedbackStatus}`} data-testid="modal-overlay">
                     <div className="question modal">
                         <div className="modal__header">
-                            <Timer setQuestionModal={setShowQuestionModal} isPaused={isValidating} />
+                            {!isValidating && <Timer setQuestionModal={setShowQuestionModal} />}
                         </div>
 
                         <p className="modal__question">{question.question}</p>
