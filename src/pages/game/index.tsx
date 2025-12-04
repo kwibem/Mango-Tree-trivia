@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import response from "./data";
@@ -8,6 +8,7 @@ import Navigation from "../../components/navigation";
 import Layout from "../../components/Layout";
 import GameGrid from "../../components/GameGrid";
 import Button from "../../components/Button";
+import RoundSplash from "../../components/RoundSplash/RoundSplash";
 
 import "./Game.css"
 
@@ -23,15 +24,32 @@ const Game = () => {
     const [points, setPoints] = useState<number>(0)
     const [pointTracker, setPointTracker] = useState<number>(0)
     const [round, setRound] = useState<number>(1)
+    const [showSplash, setShowSplash] = useState<boolean>(true);
     const navigate = useNavigate()
 
-    const areAllCellsClicked: boolean = useMemo(() => 
-        monitorGridClick.flat().every(isClicked => isClicked), 
+    const areAllCellsClicked: boolean = useMemo(() =>
+        monitorGridClick.flat().every(isClicked => isClicked),
         [monitorGridClick]
     )
 
+    useEffect(() => {
+        // Push state to prevent going back
+        window.history.pushState(null, "", window.location.href);
+
+        const handlePopState = () => {
+            window.history.pushState(null, "", window.location.href);
+            alert("You cannot go back during the game!");
+        };
+
+        window.addEventListener("popstate", handlePopState);
+
+        return () => {
+            window.removeEventListener("popstate", handlePopState);
+        };
+    }, []);
+
     function handleCardClick(rowIndex: number, columnIndex: number, question: IQuestion, gamePoints: number) {
-        if(monitorGridClick[rowIndex][columnIndex]) return;
+        if (monitorGridClick[rowIndex][columnIndex]) return;
 
         let newTrackerGrid: boolean[][] = [...monitorGridClick]
         newTrackerGrid[rowIndex][columnIndex] = true
@@ -45,15 +63,22 @@ const Game = () => {
 
     function handleUpdateRound(): void {
         setMonitorGridClick(clickTrackerGrid())
-        if(round === 3 ){
-            navigate("/final")
+        if (round === 3) {
+            navigate("/final", { state: { completed: true } })
             return;
         }
         setRound(prevState => prevState + 1)
+        setShowSplash(true);
     }
 
     return (
         <Layout>
+            {showSplash && (
+                <RoundSplash
+                    round={round}
+                    onStart={() => setShowSplash(false)}
+                />
+            )}
             <Navigation round={round} points={points} />
             <GameGrid
                 data={data}

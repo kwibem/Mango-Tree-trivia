@@ -1,46 +1,84 @@
-# Getting Started with Create React App
+# Mango Tree Trivia
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Mango Tree Trivia is an interactive React-based trivia application that leverages local Large Language Models (LLMs) to intelligently validate user answers. Unlike traditional trivia games that require exact string matches, Mango Tree Trivia understands context, synonyms, and minor typos, providing a smoother and more enjoyable player experience.
+
+## Features
+
+- **AI-Powered Validation**: Uses [Ollama](https://ollama.com/) to run a local LLM for checking answers, allowing for natural language understanding.
+- **Smart Fallback**: Automatically switches to fuzzy string matching if the local LLM is unavailable.
+- **Timed Gameplay**: Challenge yourself with a countdown timer for each question.
+- **Score Tracking**: Keep track of your correct answers throughout the session.
+- **Responsive Design**: Built with React and modern CSS for a clean user interface.
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+- **Node.js** (v16 or higher recommended)
+- **npm** (usually comes with Node.js)
+- **[Ollama](https://ollama.com/)** (Required for AI answer validation)
+
+## Setup & Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone <repository-url>
+    cd Mango-Tree-trivia
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    npm install
+    ```
+
+3.  **Configure Environment Variables:**
+    Copy the example environment file to create your local configuration.
+    ```bash
+    cp .env.example .env
+    ```
+    
+    Open `.env` and adjust the settings if necessary:
+    - `REACT_APP_TIMER_DURATION`: Time in seconds for each question (default: 20).
+    - `REACT_APP_OLLAMA_API_URL`: URL for your local Ollama instance (default: `http://localhost:11434/api/generate`).
+    - `REACT_APP_OLLAMA_MODEL`: The LLM model to use (default: `qwen2.5:3b`).
+
+## Running the Application
+
+### 1. Start Ollama (AI Service)
+
+To enable intelligent answer validation, you need to have Ollama running with the specified model.
+
+First, pull the model defined in your `.env` (e.g., `qwen2.5:3b`):
+```bash
+ollama pull qwen2.5:3b
+```
+
+Then, start the Ollama server:
+```bash
+ollama serve
+```
+*Note: If you skip this step, the game will fallback to basic fuzzy string matching.*
+
+### 2. Start the React App
+
+In a new terminal window, run:
+```bash
+npm start
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
 ## Available Scripts
 
 In the project directory, you can run:
 
-### `npm start`
+- **`npm start`**: Runs the app in development mode.
+- **`npm test`**: Launches the test runner.
+- **`npm run build`**: Builds the app for production to the `build` folder.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Technologies Used
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- React 19
+- TypeScript
+- React Router
+- Ollama (Local LLM Integration)
