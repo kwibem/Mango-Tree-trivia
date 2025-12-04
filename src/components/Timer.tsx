@@ -3,7 +3,7 @@ import useTimeCounter from "../utils/hooks/useTimeCounter";
 import './Timer.css';
 
 interface ITimerProps {
-   setQuestionModal: React.Dispatch<React.SetStateAction<boolean>>
+    setQuestionModal: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const Timer: React.FC<ITimerProps> = props => {
@@ -15,14 +15,14 @@ const Timer: React.FC<ITimerProps> = props => {
     return (
         <div className="timer-container">
             <div className="timer-progress-bar">
-                <div 
-                    className="timer-progress-fill" 
+                <div
+                    className="timer-progress-fill"
                     style={{ width: `${progress}%` }}
                 ></div>
             </div>
-            <div className="timer-text">
+            {/* <div className="timer-text">
                 Time remaining: {seconds}s
-            </div>
+            </div> */}
         </div>
     );
 };

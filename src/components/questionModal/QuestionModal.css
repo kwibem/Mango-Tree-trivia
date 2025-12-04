@@ -64,7 +64,7 @@
     font-size: 1.1em;
     font-weight: 600;
     color: white;
-    background-color: #007bff;
+    background-color: #6c757d;
     border: none;
     border-radius: 8px;
     cursor: pointer;
@@ -73,9 +73,9 @@
 }
 
 .modal__submit-btn:hover {
-    background-color: #0056b3;
+    background-color: #5a6268;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
 }
 
 .modal__submit-btn:active {

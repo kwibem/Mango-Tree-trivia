@@ -69,7 +69,7 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
                 <div className={`modal-overlay ${feedbackStatus}`} data-testid="modal-overlay">
                     <div className="question modal">
                         <div className="modal__header">
-                            <Timer setQuestionModal={setShowQuestionModal} />
+                            {!isValidating && <Timer setQuestionModal={setShowQuestionModal} />}
                         </div>
 
                         <p className="modal__question">{question.question}</p>

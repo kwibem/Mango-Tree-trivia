@@ -12,15 +12,10 @@ describe('Timer Component', () => {
         (useTimeCounter as jest.Mock).mockReturnValue(5);
     });
 
-    test('renders time remaining', () => {
-        render(<Timer setQuestionModal={() => { }} />);
-        // screen.debug(); 
-        expect(screen.getByText('Time remaining: 5s')).toBeInTheDocument();
-    });
-
     test('renders progress bar', () => {
         const { container } = render(<Timer setQuestionModal={() => { }} />);
         const progressBar = container.querySelector('.timer-progress-fill');
         expect(progressBar).toBeInTheDocument();
     });
+
 });

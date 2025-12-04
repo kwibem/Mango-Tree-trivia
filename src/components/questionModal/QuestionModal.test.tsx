@@ -54,7 +54,7 @@ describe('QuestionModal Component', () => {
     test('submitting correct answer adds points and closes modal', async () => {
         (validateAnswerWithLLM as jest.Mock).mockResolvedValue(true);
 
-        render(
+        const { container } = render(
             <QuestionModal
                 question={mockQuestion}
                 pointTracker={100}
@@ -72,6 +72,17 @@ describe('QuestionModal Component', () => {
 
         // Expect button to show loading state
         expect(screen.getByText('Checking...')).toBeInTheDocument();
+
+        // Wait for validation state (button text changes)
+        await waitFor(() => {
+            expect(screen.getByText('Checking...')).toBeInTheDocument();
+        });
+
+        // Verify Timer is NOT in the document
+        const timer = screen.queryByText('Time remaining:', { exact: false }); // Or query by class if text is hidden
+        // Since text is hidden, let's query by the progress bar class
+        const progressBar = container.querySelector('.timer-progress-fill');
+        expect(progressBar).not.toBeInTheDocument();
 
         // Wait for feedback state
         await waitFor(() => {
