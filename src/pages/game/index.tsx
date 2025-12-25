@@ -21,7 +21,6 @@ const Game = () => {
     const [showQuestionModal, setShowQuestionModal] = useState<boolean>(false)
     const [monitorGridClick, setMonitorGridClick] = useState<boolean[][]>(clickTrackerGrid())
     const [question, setQuestion] = useState<Partial<IQuestion>>({})
-    const [points, setPoints] = useState<number>(0)
     const [pointTracker, setPointTracker] = useState<number>(0)
     const [round, setRound] = useState<number>(1)
     const [showSplash, setShowSplash] = useState<boolean>(true);
@@ -79,7 +78,7 @@ const Game = () => {
                     onStart={() => setShowSplash(false)}
                 />
             )}
-            <Navigation round={round} points={points} />
+            <Navigation round={round} />
             <GameGrid
                 data={data}
                 monitorGridClick={monitorGridClick}
@@ -95,7 +94,6 @@ const Game = () => {
                 showQuestionModal={showQuestionModal}
                 question={question}
                 pointTracker={pointTracker}
-                setPoints={setPoints}
             />
             {(areAllCellsClicked && !showQuestionModal) && (
                 <div style={{ textAlign: 'center', marginTop: '20px' }}>
