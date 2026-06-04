@@ -32,6 +32,6 @@ jobs:
             `.github/claude-review-prompt.md` exactly. Review the changes in this
             pull request against its base branch, and post your review as a PR comment.
           claude_args: |
-            --model claude-opus-4-7
+            --model claude-opus-4-6
             --max-turns 15
           use_sticky_comment: true
