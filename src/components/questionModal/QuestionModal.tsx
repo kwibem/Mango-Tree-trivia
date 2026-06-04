@@ -1,5 +1,6 @@
 import React from "react";
 import { IQuestion } from "../../utils/interfaces/questionInterface";
+import { usePlayer } from "../../context/PlayerContext";
 
 import Timer from "../Timer";
 import "./QuestionModal.css"
@@ -10,17 +11,15 @@ interface IQuestionModalProps {
     question: Partial<IQuestion>;
     pointTracker: number;
     showQuestionModal: boolean;
-    setPoints: React.Dispatch<React.SetStateAction<number>>;
     setShowQuestionModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-
-
 export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
-    const { question, showQuestionModal, pointTracker, setShowQuestionModal, setPoints } = props
+    const { question, showQuestionModal, pointTracker, setShowQuestionModal } = props
     const [userAnswer, setUserAnswer] = React.useState<string>("");
     const [isValidating, setIsValidating] = React.useState<boolean>(false);
     const [feedbackStatus, setFeedbackStatus] = React.useState<'idle' | 'correct' | 'incorrect'>('idle');
+    const { addScore, nextTurn, players, currentPlayerIndex } = usePlayer();
 
     const handleSubmit = async (): Promise<void> => {
         if (typeof question.correct_answer === "undefined" || typeof question.question === "undefined") return;
@@ -38,17 +37,18 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
                 setFeedbackStatus('correct');
                 // Wait for animation
                 await new Promise(resolve => setTimeout(resolve, 500));
-                setPoints(prevPoints => prevPoints + pointTracker);
+                addScore(pointTracker);
             } else {
                 setFeedbackStatus('incorrect');
                 // Wait for animation
                 await new Promise(resolve => setTimeout(resolve, 500));
-                setPoints(prevPoints => prevPoints - pointTracker);
+                addScore(-pointTracker);
             }
 
             setUserAnswer(""); // Reset answer
             setFeedbackStatus('idle');
             setShowQuestionModal(false);
+            nextTurn(); // Switch turn after interaction
         } catch (error) {
             console.error("Error validating answer:", error);
             // Handle error appropriately, maybe show a message
@@ -63,12 +63,17 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
         }
     }
 
+    const currentPlayerName = players[currentPlayerIndex]?.name || "Player";
+
     return (
         <>
             {showQuestionModal && (
                 <div className={`modal-overlay ${feedbackStatus}`} data-testid="modal-overlay">
                     <div className="question modal">
                         <div className="modal__header">
+                            <div style={{ marginBottom: '10px', textAlign: 'center', fontWeight: 'bold' }}>
+                                Current Turn: {currentPlayerName}
+                            </div>
                             {!isValidating && <Timer setQuestionModal={setShowQuestionModal} />}
                         </div>
 
@@ -81,7 +86,7 @@ export const QuestionModal: React.FC<IQuestionModalProps> = (props) => {
                                 value={userAnswer}
                                 onChange={(e) => setUserAnswer(e.target.value)}
                                 onKeyDown={handleKeyDown}
-                                placeholder="Type your answer..."
+                                placeholder={`Answer as ${currentPlayerName}...`}
                                 autoFocus
                                 disabled={isValidating}
                             />

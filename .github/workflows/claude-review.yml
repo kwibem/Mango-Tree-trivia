@@ -1,0 +1,37 @@
+name: Claude PR Review
+
+on:
+  pull_request:
+    types: [opened, labeled]
+
+# Run on PR open, or when the "ai-review" label is added.
+jobs:
+  review:
+    if: >
+      github.event.action == 'opened' ||
+      (github.event.action == 'labeled' && github.event.label.name == 'ai-review')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Claude review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Follow the review instructions in the repository file
+            `.github/claude-review-prompt.md` exactly. Review the changes in this
+            pull request against its base branch, and post your review as a PR comment.
+          claude_args: |
+            --model claude-opus-4-7
+            --max-turns 15
+          use_sticky_comment: true
