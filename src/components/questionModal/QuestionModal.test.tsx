@@ -3,9 +3,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { QuestionModal } from './QuestionModal';
 import { IQuestion } from '../../utils/interfaces/questionInterface';
 import { validateAnswerWithLLM } from '../../services/llmService';
+import * as PlayerContext from '../../context/PlayerContext';
 
 // Mock the LLM service
 jest.mock('../../services/llmService');
+jest.mock('../../context/PlayerContext');
 
 const mockQuestion: Partial<IQuestion> = {
     question: 'What is the capital of France?',
@@ -14,13 +16,20 @@ const mockQuestion: Partial<IQuestion> = {
 };
 
 describe('QuestionModal Component', () => {
-    const mockSetPoints = jest.fn();
     const mockSetShowQuestionModal = jest.fn();
+    const mockAddScore = jest.fn();
+    const mockNextTurn = jest.fn();
 
     beforeEach(() => {
         jest.clearAllMocks();
         // Default mock implementation to return true (correct answer)
         (validateAnswerWithLLM as jest.Mock).mockResolvedValue(true);
+        (PlayerContext.usePlayer as jest.Mock).mockReturnValue({
+            addScore: mockAddScore,
+            nextTurn: mockNextTurn,
+            players: [{ name: 'Player 1', score: 0 }],
+            currentPlayerIndex: 0
+        });
     });
 
     test('renders nothing when showQuestionModal is false', () => {
@@ -29,7 +38,6 @@ describe('QuestionModal Component', () => {
                 question={mockQuestion}
                 pointTracker={100}
                 showQuestionModal={false}
-                setPoints={mockSetPoints}
                 setShowQuestionModal={mockSetShowQuestionModal}
             />
         );
@@ -42,12 +50,11 @@ describe('QuestionModal Component', () => {
                 question={mockQuestion}
                 pointTracker={100}
                 showQuestionModal={true}
-                setPoints={mockSetPoints}
                 setShowQuestionModal={mockSetShowQuestionModal}
             />
         );
         expect(screen.getByText('What is the capital of France?')).toBeInTheDocument();
-        expect(screen.getByPlaceholderText('Type your answer...')).toBeInTheDocument();
+        expect(screen.getByPlaceholderText('Answer as Player 1...')).toBeInTheDocument();
         expect(screen.getByText('Submit')).toBeInTheDocument();
     });
 
@@ -59,12 +66,11 @@ describe('QuestionModal Component', () => {
                 question={mockQuestion}
                 pointTracker={100}
                 showQuestionModal={true}
-                setPoints={mockSetPoints}
                 setShowQuestionModal={mockSetShowQuestionModal}
             />
         );
 
-        const input = screen.getByPlaceholderText('Type your answer...');
+        const input = screen.getByPlaceholderText('Answer as Player 1...');
         fireEvent.change(input, { target: { value: 'Paris' } });
 
         const submitBtn = screen.getByText('Submit');
@@ -79,8 +85,6 @@ describe('QuestionModal Component', () => {
         });
 
         // Verify Timer is NOT in the document
-        const timer = screen.queryByText('Time remaining:', { exact: false }); // Or query by class if text is hidden
-        // Since text is hidden, let's query by the progress bar class
         const progressBar = container.querySelector('.timer-progress-fill');
         expect(progressBar).not.toBeInTheDocument();
 
@@ -92,9 +96,10 @@ describe('QuestionModal Component', () => {
 
         // Wait for modal to close (after delay)
         await waitFor(() => {
-            expect(mockSetPoints).toHaveBeenCalledWith(expect.any(Function));
+            expect(mockAddScore).toHaveBeenCalledWith(100);
             expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
-        }, { timeout: 1000 }); // Increase timeout to account for 500ms delay
+            expect(mockNextTurn).toHaveBeenCalled();
+        }, { timeout: 1000 });
     });
 
     test('submitting incorrect answer subtracts points and closes modal', async () => {
@@ -105,12 +110,11 @@ describe('QuestionModal Component', () => {
                 question={mockQuestion}
                 pointTracker={100}
                 showQuestionModal={true}
-                setPoints={mockSetPoints}
                 setShowQuestionModal={mockSetShowQuestionModal}
             />
         );
 
-        const input = screen.getByPlaceholderText('Type your answer...');
+        const input = screen.getByPlaceholderText('Answer as Player 1...');
         fireEvent.change(input, { target: { value: 'Wrong' } });
 
         const submitBtn = screen.getByText('Submit');
@@ -123,8 +127,9 @@ describe('QuestionModal Component', () => {
         });
 
         await waitFor(() => {
-            expect(mockSetPoints).toHaveBeenCalledWith(expect.any(Function));
+            expect(mockAddScore).toHaveBeenCalledWith(-100);
             expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
+            expect(mockNextTurn).toHaveBeenCalled();
         }, { timeout: 1000 });
     });
 
@@ -136,19 +141,18 @@ describe('QuestionModal Component', () => {
                 question={mockQuestion}
                 pointTracker={100}
                 showQuestionModal={true}
-                setPoints={mockSetPoints}
                 setShowQuestionModal={mockSetShowQuestionModal}
             />
         );
 
-        const input = screen.getByPlaceholderText('Type your answer...');
+        const input = screen.getByPlaceholderText('Answer as Player 1...');
         fireEvent.change(input, { target: { value: 'paris' } }); // lowercase
 
         const submitBtn = screen.getByText('Submit');
         fireEvent.click(submitBtn);
 
         await waitFor(() => {
-            expect(mockSetPoints).toHaveBeenCalled();
+            expect(mockAddScore).toHaveBeenCalled();
             expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
         });
     });
@@ -161,19 +165,18 @@ describe('QuestionModal Component', () => {
                 question={mockQuestion}
                 pointTracker={100}
                 showQuestionModal={true}
-                setPoints={mockSetPoints}
                 setShowQuestionModal={mockSetShowQuestionModal}
             />
         );
 
-        const input = screen.getByPlaceholderText('Type your answer...');
+        const input = screen.getByPlaceholderText('Answer as Player 1...');
         fireEvent.change(input, { target: { value: 'Pari' } });
 
         const submitBtn = screen.getByText('Submit');
         fireEvent.click(submitBtn);
 
         await waitFor(() => {
-            expect(mockSetPoints).toHaveBeenCalledWith(expect.any(Function));
+            expect(mockAddScore).toHaveBeenCalledWith(100);
             expect(mockSetShowQuestionModal).toHaveBeenCalledWith(false);
         });
     });

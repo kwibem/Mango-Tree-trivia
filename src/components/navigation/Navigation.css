@@ -11,3 +11,11 @@
   width: calc(100% + 40px);
   margin: -20px -20px 0 -20px;
 }
+
+.active-player {
+  font-weight: bold;
+  text-decoration: underline;
+  color: #4CAF50;
+  transform: scale(1.1);
+  transition: all 0.3s ease;
+}

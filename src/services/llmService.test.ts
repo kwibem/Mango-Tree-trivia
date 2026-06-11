@@ -8,8 +8,16 @@ jest.mock('../utils/stringUtils');
 global.fetch = jest.fn();
 
 describe('validateAnswerWithLLM', () => {
+    let warnSpy: jest.SpyInstance;
+
     beforeEach(() => {
         jest.clearAllMocks();
+        // The fallback path intentionally warns; silence it to keep test output clean.
+        warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+        warnSpy.mockRestore();
     });
 
     it('should return true when Ollama responds with YES', async () => {
@@ -42,6 +50,7 @@ describe('validateAnswerWithLLM', () => {
 
         expect(result).toBe(true);
         expect(isFuzzyMatch).toHaveBeenCalledWith('User', 'Correct');
+        expect(warnSpy).toHaveBeenCalled();
     });
 
     it('should fall back to fuzzy match when response is not ok', async () => {
