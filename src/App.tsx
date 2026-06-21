@@ -3,10 +3,22 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from "./pages/home";
 import Game from "./pages/game";
 import Final from "./pages/final";
+import GuestModal from "./components/GuestModal/GuestModal";
+import { GUEST_NAME_KEY } from "./utils/guestName";
 
 function App(): React.JSX.Element {
+  const [guestName, setGuestName] = React.useState<string | null>(
+    () => sessionStorage.getItem(GUEST_NAME_KEY)
+  );
+
+  const handleGuestSubmit = (name: string): void => {
+    sessionStorage.setItem(GUEST_NAME_KEY, name);
+    setGuestName(name);
+  };
+
   return (
     <div className="App">
+      {!guestName && <GuestModal onSubmit={handleGuestSubmit} />}
       <Router>
         <Routes>
           <Route index element={ <Home/> } />

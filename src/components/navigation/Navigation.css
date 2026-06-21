@@ -11,3 +11,19 @@
   width: calc(100% + 40px);
   margin: -20px -20px 0 -20px;
 }
+
+.navigation__right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: auto;
+}
+
+.navigation__guest-name {
+  max-width: 12ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  color: #1e3a8a;
+}
