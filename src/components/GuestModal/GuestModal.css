@@ -1,0 +1,116 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.guest .input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal.guest .modal__input {
+    padding: 15px;
+    font-size: 1.1em;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+}
+
+.modal.guest .modal__input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.modal.guest .modal__submit-btn {
+    padding: 12px 24px;
+    font-size: 1.1em;
+    font-weight: 600;
+    color: white;
+    background: linear-gradient(#3b82f6, #2563eb);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal.guest .modal__submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.modal.guest .modal__submit-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.modal.guest {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1001;
+    text-align: center;
+}
+
+.guest-modal__title {
+    margin: 0 0 8px 0;
+    font-size: 1.4em;
+    color: #1e3a8a;
+}
+
+.guest-modal__subtitle {
+    margin: 0 0 20px 0;
+    color: #555;
+}
+
+.guest-modal__divider {
+    margin: 20px 0 16px 0;
+    color: #999;
+    font-size: 0.9em;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.guest-modal__signup-btn {
+    width: 100%;
+    padding: 12px 24px;
+    font-size: 1em;
+    font-weight: 600;
+    color: white;
+    background-color: #93c5fd;
+    border: none;
+    border-radius: 8px;
+    opacity: 0.6;
+    cursor: not-allowed;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.guest-modal__badge {
+    font-size: 0.7em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    padding: 2px 8px;
+}
