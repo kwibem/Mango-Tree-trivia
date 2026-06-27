@@ -5,6 +5,8 @@ import Game from "./pages/game";
 import Final from "./pages/final";
 import GuestModal from "./components/GuestModal/GuestModal";
 import { GUEST_NAME_KEY } from "./utils/guestName";
+import "./App.css";
+import "./components/navigation/Navigation.css";
 
 function App(): React.JSX.Element {
   const [guestName, setGuestName] = React.useState<string | null>(
@@ -19,6 +21,13 @@ function App(): React.JSX.Element {
   return (
     <div className="App">
       {!guestName && <GuestModal onSubmit={handleGuestSubmit} />}
+      {guestName && (
+        <header className="app-header">
+          <span className="navigation__guest-name" title={guestName}>
+            {guestName}
+          </span>
+        </header>
+      )}
       <Router>
         <Routes>
           <Route index element={ <Home/> } />
