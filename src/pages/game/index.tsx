@@ -4,8 +4,8 @@ import { useNavigate } from "react-router-dom";
 import response from "./data";
 import { IQuestion, IData } from "../../utils/interfaces/questionInterface";
 import { QuestionModal } from "../../components/questionModal/QuestionModal";
-import Navigation from "../../components/navigation";
 import Layout from "../../components/Layout";
+import { useGameStatus } from "../../utils/GameStatusContext";
 import GameGrid from "../../components/GameGrid";
 import Button from "../../components/Button";
 import RoundSplash from "../../components/RoundSplash/RoundSplash";
@@ -21,9 +21,8 @@ const Game = () => {
     const [showQuestionModal, setShowQuestionModal] = useState<boolean>(false)
     const [monitorGridClick, setMonitorGridClick] = useState<boolean[][]>(clickTrackerGrid())
     const [question, setQuestion] = useState<Partial<IQuestion>>({})
-    const [points, setPoints] = useState<number>(0)
+    const { round, setPoints, setRound } = useGameStatus()
     const [pointTracker, setPointTracker] = useState<number>(0)
-    const [round, setRound] = useState<number>(1)
     const [showSplash, setShowSplash] = useState<boolean>(true);
     const navigate = useNavigate()
 
@@ -31,6 +30,12 @@ const Game = () => {
         monitorGridClick.flat().every(isClicked => isClicked),
         [monitorGridClick]
     )
+
+    useEffect(() => {
+        // Start a fresh game each time the game view is entered.
+        setPoints(0)
+        setRound(1)
+    }, [setPoints, setRound])
 
     useEffect(() => {
         // Push state to prevent going back
@@ -79,7 +84,6 @@ const Game = () => {
                     onStart={() => setShowSplash(false)}
                 />
             )}
-            <Navigation round={round} points={points} />
             <GameGrid
                 data={data}
                 monitorGridClick={monitorGridClick}

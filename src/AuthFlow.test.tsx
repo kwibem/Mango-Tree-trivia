@@ -201,36 +201,42 @@ describe('Auth layer - guest name modal', () => {
     });
 });
 
-// AC 5: "Given a name has been saved, when the user is ANYWHERE in the app, then
-// the name is visible in the top-right of the navbar." These are <App /> level
-// integration tests that prove the name is shown app-wide, not just on /game.
+// AC 5 (Option A - single consolidated navbar): there is ONE navigation bar (a
+// `navigation` landmark) rendered on EVERY route. It shows the guest name app-wide
+// and, on the game route only, the Round + Points indicators alongside the name.
+// There is NO separate app-header/`banner` that only shows the name.
 //
-// Today the guest name is only rendered by <Navigation>, which is only mounted on
-// the /game route. Immediately after submitting a name the user is on the Home /
-// landing route, where the name is NOT shown - so the first test here fails
-// against the current code (RED). The Navigation.guestName unit test never caught
-// this because it renders <Navigation> in isolation.
-describe('Auth layer - guest name is visible app-wide (AC 5)', () => {
-    // Robust, layout-agnostic probe for the displayed name: prefer a navbar /
-    // header landmark if the app exposes one, otherwise fall back to the whole
-    // document. Deliberately does NOT pin to a specific CSS class.
-    const expectNameVisible = (name: string): void => {
-        const banner = screen.queryByRole('banner'); // <header>
-        const nav = screen.queryByRole('navigation'); // <nav>
-        const region = banner ?? nav ?? document.body;
-        expect(within(region).getByText(name)).toBeInTheDocument();
-    };
-
+// These are <App /> level integration tests. Against the current two-bar code
+// several FAIL (RED): the name lives in a `banner`, not the nav; Home has no nav
+// at all; on /game the name and round/points are in different bars; a separate
+// header still exists.
+describe('Auth layer - single consolidated navbar (AC 5, Option A)', () => {
     const submitName = async (name: string): Promise<void> => {
         fireEvent.change(getNameInput(), { target: { value: name } });
         fireEvent.click(getContinueButton());
         await waitFor(() => expect(isModalOpen()).toBe(false));
     };
 
-    // KEY TEST (expected to FAIL now): right after submit the user is on the
-    // Home / landing route. The name must already be visible there - without
-    // navigating into the game.
-    test('shows the submitted name on the Home/landing route immediately after submit', async () => {
+    // The name must live inside the single `navigation` landmark - and there must
+    // be NO separate `banner`/app-header. Layout-agnostic: roles + visible text,
+    // never a CSS class.
+    const expectNameInSingleNav = (name: string): void => {
+        // Single bar only: the name-only app-header is gone.
+        expect(screen.queryByRole('banner')).toBeNull();
+        const nav = screen.getByRole('navigation');
+        expect(within(nav).getByText(name)).toBeInTheDocument();
+    };
+
+    const navigateIntoGame = async (): Promise<void> => {
+        fireEvent.click(screen.getByRole('button', { name: /start the game/i }));
+        // Wait until the game view is mounted (its navbar landmark appears).
+        await screen.findByRole('navigation');
+    };
+
+    // KEY TEST (FAILS now): right after submit the user is on the Home / landing
+    // route. The name must already be visible there, inside the single navbar -
+    // and the round/points indicators must NOT be shown (they are game-only).
+    test('shows the name in the single navbar on Home, without round/points', async () => {
         render(<App />);
 
         await submitName('Penny');
@@ -240,40 +246,48 @@ describe('Auth layer - guest name is visible app-wide (AC 5)', () => {
             screen.getByRole('button', { name: /start the game/i })
         ).toBeInTheDocument();
 
-        // The name must be visible here, anywhere in the document / navbar.
-        expectNameVisible('Penny');
+        expectNameInSingleNav('Penny');
+
+        // Round/points are game-only: absent on Home.
+        expect(screen.queryByText(/Round:/i)).toBeNull();
+        expect(screen.queryByText(/Points:/i)).toBeNull();
     });
 
-    // The name must REMAIN visible after navigating away from Home into the game
+    // The name must REMAIN in the single navbar after navigating into the game
     // view (app-wide, not just a one-route accident).
-    test('keeps the name visible after navigating from Home into the game view', async () => {
+    test('keeps the name in the single navbar after navigating into the game view', async () => {
         render(<App />);
 
         await submitName('Quinn');
+        await navigateIntoGame();
 
-        // Navigate Home -> /game via the app's own CTA.
-        fireEvent.click(screen.getByRole('button', { name: /start the game/i }));
-
-        // Wait until the game view is mounted (its navbar landmark appears).
-        await screen.findByRole('navigation');
-
-        expectNameVisible('Quinn');
+        expectNameInSingleNav('Quinn');
     });
 
-    // The app-header is the SINGLE owner of the guest-name display. On /game the
-    // name must therefore render EXACTLY ONCE - not duplicated by both the
-    // app-header and the old guest-name span inside <Navigation>. Against current
-    // code this fails (length 2) until the duplicate is removed from <Navigation>.
+    // On the game route the ONE navbar shows the guest name AND the Round AND the
+    // points indicators together - all within the same `navigation` landmark.
+    test('on the game view the single navbar shows name + round + points together', async () => {
+        render(<App />);
+
+        await submitName('Sam');
+        await navigateIntoGame();
+
+        // No separate header bar.
+        expect(screen.queryByRole('banner')).toBeNull();
+
+        const nav = screen.getByRole('navigation');
+        expect(within(nav).getByText('Sam')).toBeInTheDocument();
+        expect(within(nav).getByText(/Round:/i)).toBeInTheDocument();
+        expect(within(nav).getByText(/Points:/i)).toBeInTheDocument();
+    });
+
+    // The single navbar is the SOLE owner of the guest-name display. On /game the
+    // name must therefore render EXACTLY ONCE - not duplicated across two bars.
     test('renders the name exactly once on the game view (no duplicate navbar copy)', async () => {
         render(<App />);
 
         await submitName('Robin');
-
-        // Navigate Home -> /game via the app's own CTA.
-        fireEvent.click(screen.getByRole('button', { name: /start the game/i }));
-
-        // Wait until the game view is mounted (its navbar landmark appears).
-        await screen.findByRole('navigation');
+        await navigateIntoGame();
 
         expect(screen.getAllByText('Robin')).toHaveLength(1);
     });

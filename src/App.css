@@ -2,18 +2,6 @@
   text-align: center;
 }
 
-.app-header {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  padding: 1rem 2rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  background-color: white;
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
 .App-logo {
   height: 40vmin;
   pointer-events: none;
